@@ -59,7 +59,7 @@ public class PaymentCardController {
     @Operation(summary = "Delete payment card by id", description = "Delete payment card by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Payment card deleted"),
-            @ApiResponse(responseCode = "404", description = "Payment card not found")
+            @ApiResponse(responseCode = "404", description = "Payment card not fomund")
     })
     public ResponseEntity<?> deletePaymentCardById(@PathVariable Long id) {
         var deletePaymentCardCommand = new DeletePaymentCardCommand(id);
