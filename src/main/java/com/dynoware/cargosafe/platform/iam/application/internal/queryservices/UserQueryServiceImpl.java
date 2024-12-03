@@ -4,6 +4,7 @@ import com.dynoware.cargosafe.platform.iam.domain.model.aggregates.User;
 import com.dynoware.cargosafe.platform.iam.domain.model.queries.GetAllUsersQuery;
 import com.dynoware.cargosafe.platform.iam.domain.model.queries.GetUserByIdQuery;
 import com.dynoware.cargosafe.platform.iam.domain.model.queries.GetUserByUsernameQuery;
+import com.dynoware.cargosafe.platform.iam.domain.model.queries.GetUserRoleQuery;
 import com.dynoware.cargosafe.platform.iam.domain.services.UserQueryService;
 import com.dynoware.cargosafe.platform.iam.infrastructure.persistence.jpa.repositories.UserRepository;
 import org.springframework.stereotype.Service;
@@ -58,4 +59,16 @@ public class UserQueryServiceImpl implements UserQueryService {
     public Optional<User> handle(GetUserByUsernameQuery query) {
         return userRepository.findByUsername(query.username());
     }
+
+
+    @Override
+    public Optional<String> handle(GetUserRoleQuery query) {
+        return userRepository.findByUsername(query.username())
+                .map(user -> user.getRoles().stream()
+                        .map(role -> role.getName().name())
+                        .filter(roleName -> roleName.equals("ROLE_COMPANY") || roleName.equals("ROLE_ENTREPRENEUR"))
+                        .findFirst()
+                        .orElse(null));
+    }
+
 }

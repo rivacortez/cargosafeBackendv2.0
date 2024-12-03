@@ -1,25 +1,25 @@
 package com.dynoware.cargosafe.platform.requestService.application.internal.commandservices;
 
+import com.dynoware.cargosafe.platform.iam.domain.model.aggregates.User;
+import com.dynoware.cargosafe.platform.iam.infrastructure.persistence.jpa.repositories.UserRepository;
 import com.dynoware.cargosafe.platform.requestService.domain.model.aggregates.RequestService;
 import com.dynoware.cargosafe.platform.requestService.domain.model.commands.CreateRequestServiceCommand;
 import com.dynoware.cargosafe.platform.requestService.domain.model.commands.DeleteRequestServiceCommand;
 import com.dynoware.cargosafe.platform.requestService.domain.model.commands.UpdateRequestServiceCommand;
 import com.dynoware.cargosafe.platform.requestService.domain.model.entities.RequestServiceStatus;
 import com.dynoware.cargosafe.platform.requestService.domain.model.entities.Status;
-import com.dynoware.cargosafe.platform.requestService.domain.model.queries.GetAllRequestServiceQuery;
-import com.dynoware.cargosafe.platform.requestService.domain.model.queries.GetRequestServiceByIdQuery;
 import com.dynoware.cargosafe.platform.requestService.domain.model.valueobjects.StatusName;
 import com.dynoware.cargosafe.platform.requestService.domain.services.RequestServiceCommandService;
 import com.dynoware.cargosafe.platform.requestService.infrastructure.persistence.jpa.repositories.RequestServiceRepository;
 import com.dynoware.cargosafe.platform.requestService.infrastructure.persistence.jpa.repositories.StatusRepository;
-import com.dynoware.cargosafe.platform.trips.domain.model.aggregates.*;
+import com.dynoware.cargosafe.platform.trips.domain.model.aggregates.Driver;
+import com.dynoware.cargosafe.platform.trips.domain.model.aggregates.Trip;
+import com.dynoware.cargosafe.platform.trips.domain.model.aggregates.Vehicle;
 import com.dynoware.cargosafe.platform.trips.infrastructure.persistence.jpa.DriverRepository;
 import com.dynoware.cargosafe.platform.trips.infrastructure.persistence.jpa.repositories.TripRepository;
 import com.dynoware.cargosafe.platform.trips.infrastructure.persistence.jpa.repositories.VehicleRepository;
-import com.dynoware.cargosafe.platform.trips.interfaces.rest.resources.VehicleResource;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,15 +28,16 @@ public class RequestServiceCommandServiceImpl implements RequestServiceCommandSe
     private final StatusRepository statusRepository;
     private final TripRepository tripRepository;
     private final DriverRepository driverRepository;
-    private final VehicleRepository  vehicleRepository;
+    private final VehicleRepository vehicleRepository;
+    private final UserRepository userRepository;
 
-
-    public RequestServiceCommandServiceImpl(RequestServiceRepository repository, StatusRepository statusRepository, TripRepository tripRepository,DriverRepository driverRepository,VehicleRepository vehicleRepository) {
+    public RequestServiceCommandServiceImpl(RequestServiceRepository repository, StatusRepository statusRepository, TripRepository tripRepository, DriverRepository driverRepository, VehicleRepository vehicleRepository, UserRepository userRepository) {
         this.repository = repository;
         this.statusRepository = statusRepository;
         this.tripRepository = tripRepository;
         this.driverRepository = driverRepository;
-        this.vehicleRepository  = vehicleRepository;
+        this.vehicleRepository = vehicleRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -72,6 +73,10 @@ public class RequestServiceCommandServiceImpl implements RequestServiceCommandSe
         requestServiceStatus.setStatus(status);
         requestService.getStatuses().add(requestServiceStatus);
 
+        User user = userRepository.findById(command.userId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        requestService.setUser(user);
+
         repository.save(requestService);
         return requestService;
     }
@@ -84,6 +89,11 @@ public class RequestServiceCommandServiceImpl implements RequestServiceCommandSe
         Status status = statusRepository.findById(command.statusId())
                 .orElseThrow(() -> new IllegalArgumentException("Status not found"));
         requestService.setStatus(status);
+
+        User user = userRepository.findById(command.userId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        requestService.setUser(user);
+
         repository.save(requestService);
         return requestService;
     }
@@ -120,7 +130,6 @@ public class RequestServiceCommandServiceImpl implements RequestServiceCommandSe
             trip.setDestinationDate("2024-11-21");
             trip.setTotalAmount(0.0);
 
-
             trip.setVehicle(null);
             trip.setDriver(null);
 
@@ -131,21 +140,22 @@ public class RequestServiceCommandServiceImpl implements RequestServiceCommandSe
     }
 
     public RequestService assignVehicle(RequestService requestService, Long vehicleId) {
-        Optional<Vehicle> vehicle = vehicleRepository.findById(vehicleId);
-        if (vehicle.isEmpty()) {
-            throw new IllegalArgumentException("Vehículo no encontrado con id: " + vehicleId);
-        }
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new IllegalArgumentException("Vehicle not found with id: " + vehicleId));
+        // Assuming there is a method to set the vehicle in RequestService
+        requestService.setVehicle(vehicle);
 
         repository.save(requestService);
         return requestService;
     }
 
     public RequestService assignDriver(RequestService requestService, Long driverId) {
-        Optional<Driver> driver = driverRepository.findById(driverId);
-        if (driver.isEmpty()) {
-            throw new IllegalArgumentException("Conductor no encontrado con id: " + driverId);
-        }
+        Driver driver = driverRepository.findById(driverId)
+                .orElseThrow(() -> new IllegalArgumentException("Driver not found with id: " + driverId));
+        // Assuming there is a method to set the driver in RequestService
+        requestService.setDriver(driver);
 
+        repository.save(requestService);
         return requestService;
     }
 }

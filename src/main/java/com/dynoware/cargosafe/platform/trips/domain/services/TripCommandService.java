@@ -11,4 +11,6 @@ public interface TripCommandService {
     Optional<Trip> handle(CreateTripCommand command);
     Optional<Trip> handle(UpdateTripCommand command);
     void handle(DeleteTripCommand command);
+    Optional<Trip> assignVehicle(Long tripId, Long vehicleId);
+    Optional<Trip> assignDriver(Long tripId, Long driverId);
 }

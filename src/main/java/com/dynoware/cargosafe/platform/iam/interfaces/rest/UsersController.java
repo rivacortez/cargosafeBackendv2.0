@@ -2,8 +2,10 @@ package com.dynoware.cargosafe.platform.iam.interfaces.rest;
 
 import com.dynoware.cargosafe.platform.iam.domain.model.queries.GetAllUsersQuery;
 import com.dynoware.cargosafe.platform.iam.domain.model.queries.GetUserByIdQuery;
+import com.dynoware.cargosafe.platform.iam.domain.model.queries.GetUserRoleQuery;
 import com.dynoware.cargosafe.platform.iam.domain.services.UserQueryService;
 import com.dynoware.cargosafe.platform.iam.interfaces.rest.resources.UserResource;
+import com.dynoware.cargosafe.platform.iam.interfaces.rest.resources.UserRoleResource;
 import com.dynoware.cargosafe.platform.iam.interfaces.rest.transform.UserResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -77,4 +79,18 @@ public class    UsersController {
         var userResource = UserResourceFromEntityAssembler.toResourceFromEntity(user.get());
         return ResponseEntity.ok(userResource);
     }
+
+    @GetMapping("/role/{username}")
+    @Operation(summary = "Get user role by username", description = "Get the role of the user with the given username.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Role retrieved successfully."),
+            @ApiResponse(responseCode = "404", description = "User not found."),
+            @ApiResponse(responseCode = "401", description = "Unauthorized.")})
+    public ResponseEntity<UserRoleResource> getUserRoleByUsername(@PathVariable String username) {
+        var query = new GetUserRoleQuery(username);
+        var role = userQueryService.handle(query);
+        return role.map(r -> ResponseEntity.ok(new UserRoleResource(r)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 }

@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "api/v1/trips")
@@ -86,5 +87,23 @@ public class TripController {
     public ResponseEntity<Void> deleteTrip(@PathVariable Long id) {
         tripCommandService.handle(new DeleteTripCommand(id));
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/vehicle")
+    public ResponseEntity<TripResource> assignVehicle(@PathVariable Long id, @RequestBody Long vehicleId) {
+        Optional<Trip> trip = tripCommandService.assignVehicle(id, vehicleId);
+        if (trip.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(TripResourceFromEntityAssembler.toResourceFromEntity(trip.get()));
+    }
+
+    @PutMapping("/{id}/driver")
+    public ResponseEntity<TripResource> assignDriver(@PathVariable Long id, @RequestBody Long driverId) {
+        Optional<Trip> trip = tripCommandService.assignDriver(id, driverId);
+        if (trip.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(TripResourceFromEntityAssembler.toResourceFromEntity(trip.get()));
     }
 }

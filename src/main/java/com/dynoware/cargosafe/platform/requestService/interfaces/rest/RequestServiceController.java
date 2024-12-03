@@ -7,6 +7,7 @@ import com.dynoware.cargosafe.platform.requestService.domain.model.aggregates.Re
 import com.dynoware.cargosafe.platform.requestService.domain.model.commands.DeleteRequestServiceCommand;
 import com.dynoware.cargosafe.platform.requestService.domain.model.commands.UpdateRequestServiceCommand;
 import com.dynoware.cargosafe.platform.requestService.domain.model.entities.Status;
+import com.dynoware.cargosafe.platform.requestService.domain.model.queries.GetAllRequestServiceByUserIdQuery;
 import com.dynoware.cargosafe.platform.requestService.domain.model.queries.GetAllRequestServiceQuery;
 import com.dynoware.cargosafe.platform.requestService.domain.model.queries.GetRequestServiceByIdQuery;
 import com.dynoware.cargosafe.platform.requestService.interfaces.rest.resources.CreateRequestServiceResource;
@@ -65,7 +66,8 @@ public class RequestServiceController {
                 resource.destinationLat(),
                 resource.destinationLng(),
                 resource.loadDetail(),
-                resource.weight()
+                resource.weight(),
+                resource.userId()
         );
         var updatedRequestService = commandService.handle(command);
         var requestServiceResource = RequestServiceResourceFromEntityAssembler.transformResourceFromEntity(updatedRequestService);
@@ -127,5 +129,15 @@ public class RequestServiceController {
         var updatedRequestService = commandService.assignDriver(requestService, driverId);
         var requestServiceResource = RequestServiceResourceFromEntityAssembler.transformResourceFromEntity(updatedRequestService);
         return ResponseEntity.ok(requestServiceResource);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<RequestServiceResource>> getRequestServicesByUserId(@PathVariable Long userId) {
+        var query = new GetAllRequestServiceByUserIdQuery(userId);
+        var requestServices = queryService.handle(query);
+        var requestServiceResources = requestServices.stream()
+                .map(RequestServiceResourceFromEntityAssembler::transformResourceFromEntity)
+                .toList();
+        return ResponseEntity.ok(requestServiceResources);
     }
 }

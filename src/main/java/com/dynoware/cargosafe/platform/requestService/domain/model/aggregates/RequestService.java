@@ -1,9 +1,12 @@
 package com.dynoware.cargosafe.platform.requestService.domain.model.aggregates;
 
+import com.dynoware.cargosafe.platform.iam.domain.model.aggregates.User;
 import com.dynoware.cargosafe.platform.requestService.domain.model.entities.RequestServiceStatus;
 import com.dynoware.cargosafe.platform.requestService.domain.model.entities.Status;
 import com.dynoware.cargosafe.platform.requestService.domain.model.valueobjects.StatusName;
 import com.dynoware.cargosafe.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+import com.dynoware.cargosafe.platform.trips.domain.model.aggregates.Driver;
+import com.dynoware.cargosafe.platform.trips.domain.model.aggregates.Vehicle;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,6 +42,24 @@ public class RequestService extends AuditableAbstractAggregateRoot<RequestServic
     @JoinColumn(name = "estatus_id")
     private Status status;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @OneToMany(mappedBy = "requestService", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RequestServiceStatus> statuses = new ArrayList<>();
+
+
+    @Setter
+    @Getter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_id")
+    private Vehicle vehicle;
+
+    @Setter
+    @Getter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id")
+    private Driver driver;
+
 }

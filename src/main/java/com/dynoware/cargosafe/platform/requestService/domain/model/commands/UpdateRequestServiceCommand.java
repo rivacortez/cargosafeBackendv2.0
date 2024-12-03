@@ -21,6 +21,7 @@ public record UpdateRequestServiceCommand(
         double destinationLat,
         double destinationLng,
         String loadDetail,
-        double weight
+        double weight,
+        Long userId
 ) {
 }

@@ -20,6 +20,7 @@ public record CreateRequestServiceResource(
         double destinationLat,
         double destinationLng,
         String loadDetail,
-        double weight
+        double weight,
+        Long userId
 ) {
 }

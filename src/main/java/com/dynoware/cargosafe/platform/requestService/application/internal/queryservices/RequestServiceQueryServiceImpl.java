@@ -1,6 +1,7 @@
 package com.dynoware.cargosafe.platform.requestService.application.internal.queryservices;
 
 import com.dynoware.cargosafe.platform.requestService.domain.model.aggregates.RequestService;
+import com.dynoware.cargosafe.platform.requestService.domain.model.queries.GetAllRequestServiceByUserIdQuery;
 import com.dynoware.cargosafe.platform.requestService.domain.model.queries.GetAllRequestServiceQuery;
 import com.dynoware.cargosafe.platform.requestService.domain.model.queries.GetRequestServiceByIdQuery;
 import com.dynoware.cargosafe.platform.requestService.domain.services.RequestServiceQueryService;
@@ -26,5 +27,10 @@ public class RequestServiceQueryServiceImpl implements RequestServiceQueryServic
     @Override
     public List<RequestService> handle(GetAllRequestServiceQuery query) {
         return repository.findAll();
+    }
+
+    @Override
+    public List<RequestService> handle(GetAllRequestServiceByUserIdQuery query) {
+        return repository.findByUserId(query.userId());
     }
 }

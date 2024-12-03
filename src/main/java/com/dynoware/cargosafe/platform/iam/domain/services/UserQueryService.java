@@ -4,6 +4,7 @@ import com.dynoware.cargosafe.platform.iam.domain.model.aggregates.User;
 import com.dynoware.cargosafe.platform.iam.domain.model.queries.GetAllUsersQuery;
 import com.dynoware.cargosafe.platform.iam.domain.model.queries.GetUserByIdQuery;
 import com.dynoware.cargosafe.platform.iam.domain.model.queries.GetUserByUsernameQuery;
+import com.dynoware.cargosafe.platform.iam.domain.model.queries.GetUserRoleQuery;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,4 +41,8 @@ public interface UserQueryService {
      * @return The user found.
      */
     Optional<User> handle(GetUserByUsernameQuery query);
+
+
+
+    Optional<String> handle(GetUserRoleQuery query);
 }
